@@ -1,0 +1,3 @@
+package reservations
+
+func RegisterRoutes() {}

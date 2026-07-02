@@ -1,0 +1,3 @@
+package parking
+
+func RegisterRoutes() {}
