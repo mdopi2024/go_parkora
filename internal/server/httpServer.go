@@ -2,6 +2,7 @@ package server
 
 import (
 	"parkora/internal/config"
+	"parkora/internal/parking"
 	"parkora/internal/users"
 
 	"github.com/go-playground/validator/v10"
@@ -27,6 +28,7 @@ func StartServer(db *gorm.DB) {
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	users.AuthRegister(e, db)
+	parking.RegisterRoutes(e, db)
 
 	if err := e.Start(":" + config.LoadEnv().Port); err != nil {
 		e.Logger.Error("failed to start server", "error", err)

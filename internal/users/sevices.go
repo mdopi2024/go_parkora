@@ -61,33 +61,19 @@ func (s *UserService) Register(req userdto.RegisterUserRequest) (userdto.Registe
 	return user.ToCreateResponse("User registered successfully"), nil
 }
 
-func (s *UserService) Login(req userdto.LoginUserRequest) (userdto.LoginUserResponse, *httpresponse.ErrorResponse) {
-	if req.Email == "" {
-		return userdto.LoginUserResponse{}, &httpresponse.ErrorResponse{
-			Success: false,
-			Message: "email is required",
-			Errors:  errors.New("email is required"),
-		}
-	}
-	if req.Password == "" {
-		return userdto.LoginUserResponse{}, &httpresponse.ErrorResponse{
-			Success: false,
-			Message: "password is required",
-			Errors:  errors.New("password is required"),
-		}
-	}
+func (s *UserService) Login(req *userdto.LoginUserRequest) (*userdto.LoginUserResponse, *httpresponse.ErrorResponse) {
 
 	user, err := s.repo.FindByEmail(req.Email)
 	if err != nil {
-		return userdto.LoginUserResponse{}, &httpresponse.ErrorResponse{
+		return &userdto.LoginUserResponse{}, &httpresponse.ErrorResponse{
 			Success: false,
 			Message: "invalid credentials",
-			Errors:  errors.New("invalid credentials"),
+			Errors:  err.Error(),
 		}
 	}
 
 	if !auth.CheckPassword(user.Password, req.Password) {
-		return userdto.LoginUserResponse{}, &httpresponse.ErrorResponse{
+		return &userdto.LoginUserResponse{}, &httpresponse.ErrorResponse{
 			Success: false,
 			Message: "invalid credentials",
 			Errors:  errors.New("invalid credentials"),
@@ -96,22 +82,12 @@ func (s *UserService) Login(req userdto.LoginUserRequest) (userdto.LoginUserResp
 
 	token, err := s.auth.GenerateToken(user.ID, user.Email, user.Role)
 	if err != nil {
-		return userdto.LoginUserResponse{}, &httpresponse.ErrorResponse{
+		return &userdto.LoginUserResponse{}, &httpresponse.ErrorResponse{
 			Success: false,
 			Message: "failed to generate token",
 			Errors:  errors.New("failed to generate token"),
 		}
 	}
-
-	return user.ToLoginResponse(token, "Login successful"), nil
+	response := user.ToLoginResponse(token, "Login successful")
+	return &response, nil
 }
-
-func (s *UserService) CreateUser(user *User) error {
-	return s.repo.CreateUser(user)
-}
-
-func (s *UserService) FindByEmail(email string) (*User, error) {
-	return s.repo.FindByEmail(email)
-}
-
-var ErrInvalidCredentials = errors.New("invalid credentials")

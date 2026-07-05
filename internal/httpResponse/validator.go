@@ -1,11 +1,9 @@
-package users
+package httpresponse
 
 import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	httpresponse "parkora/internal/httpResponse"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v5"
@@ -22,7 +20,7 @@ func ValidationError(c *echo.Context, err error) error {
 		fieldErrors["error"] = err.Error()
 	}
 
-	return c.JSON(http.StatusBadRequest, httpresponse.ErrorResponse{
+	return c.JSON(http.StatusBadRequest, ErrorResponse{
 		Success: false,
 		Message: "Validation failed",
 		Errors:  fieldErrors,

@@ -14,5 +14,5 @@ func AuthRegister(e *echo.Echo, db *gorm.DB) {
 	handler := NewHandler(service)
 	api := e.Group("/api/v1/auth")
 	api.POST("/register", handler.Register)
-
+	api.POST("/login", handler.Login)
 }

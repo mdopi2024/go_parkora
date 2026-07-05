@@ -28,7 +28,7 @@ func (h *Handler) Register(c *echo.Context) error {
 	}
 
 	if err := c.Validate(req); err != nil {
-		return ValidationError(c, err)
+		return httpresponse.ValidationError(c, err)
 	}
 
 	resp, errResp := h.service.Register(req)
@@ -54,10 +54,10 @@ func (h *Handler) Login(c *echo.Context) error {
 	}
 
 	if err := c.Validate(req); err != nil {
-		return ValidationError(c, err)
+		return httpresponse.ValidationError(c, err)
 	}
 
-	resp, errResp := h.service.Login(req)
+	resp, errResp := h.service.Login(&req)
 	if errResp != nil {
 		return c.JSON(http.StatusUnauthorized, &httpresponse.ErrorResponse{
 			Success: false,
