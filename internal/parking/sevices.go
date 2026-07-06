@@ -1,8 +1,12 @@
 package parking
 
 import (
+	"errors"
+
 	httpresponse "parkora/internal/httpResponse"
 	parkingdto "parkora/internal/parking/dto"
+
+	"gorm.io/gorm"
 )
 
 type service struct {
@@ -62,5 +66,35 @@ func (s *service) GetAllParkingZones() (*parkingdto.GetAllParkingZonesResponse, 
 		Success: true,
 		Message: "Parking zones retrieved successfully",
 		Data:    data,
+	}, nil
+}
+
+func (s *service) GetParkingZoneByID(id uint) (*parkingdto.GetParkingZoneResponse, *httpresponse.ErrorResponse) {
+	zone, err := s.repo.GetParkingZoneByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: "parking zone not found",
+			}
+		}
+		return nil, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "failed to retrieve parking zone",
+			Errors:  err.Error(),
+		}
+	}
+
+	return &parkingdto.GetParkingZoneResponse{
+		Success: true,
+		Message: "Parking zone retrieved successfully",
+		Data: parkingdto.ParkingResponse{
+			ID:             zone.ID,
+			Name:           zone.Name,
+			Type:           zone.Type,
+			TotalCapacity:  zone.TotalCapacity,
+			AvailableSpots: zone.AvailableSpots,
+			PricePerHour:   zone.PricePerHour,
+		},
 	}, nil
 }

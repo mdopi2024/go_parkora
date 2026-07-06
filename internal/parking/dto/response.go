@@ -24,3 +24,9 @@ type GetAllParkingZonesResponse struct {
 	Message string            `json:"message"`
 	Data    []ParkingResponse `json:"data"`
 }
+
+type GetParkingZoneResponse struct {
+	Success bool            `json:"success"`
+	Message string          `json:"message"`
+	Data    ParkingResponse `json:"data"`
+}
