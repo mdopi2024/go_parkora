@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	Port   string
-	PG_DSN string
+	Port      string
+	PG_DSN    string
+	SecretKey string
 }
 
 func LoadEnv() *Config {
@@ -17,8 +18,9 @@ func LoadEnv() *Config {
 		panic(err)
 	}
 	confgoenv := &Config{
-		Port:   os.Getenv("PORT"),
-		PG_DSN: os.Getenv("PG_DSN"),
+		Port:      os.Getenv("PORT"),
+		PG_DSN:    os.Getenv("PG_DSN"),
+		SecretKey: os.Getenv("SECRET_KEY"),
 	}
 
 	return confgoenv
