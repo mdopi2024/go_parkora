@@ -26,12 +26,13 @@ type ParkingZone struct {
 
 func (p *ParkingZone) ToResponse() parkingdto.ParkingResponse {
 	return parkingdto.ParkingResponse{
-		ID:            p.ID,
-		Name:          p.Name,
-		Type:          string(p.Type),
-		TotalCapacity: p.TotalCapacity,
-		PricePerHour:  p.PricePerHour,
-		CreatedAt:     p.CreatedAt,
-		UpdatedAt:     p.UpdatedAt,
+		ID:             p.ID,
+		Name:           p.Name,
+		Type:           string(p.Type),
+		TotalCapacity:  p.TotalCapacity,
+		AvailableSpots: 0, // This will be set dynamically from GetAllParkingZones
+		PricePerHour:   p.PricePerHour,
+		CreatedAt:      p.CreatedAt,
+		UpdatedAt:      p.UpdatedAt,
 	}
 }

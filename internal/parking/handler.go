@@ -42,3 +42,16 @@ func (h *Handler) Create(c *echo.Context) error {
 
 	return c.JSON(http.StatusCreated, resp)
 }
+
+func (h *Handler) GetAll(c *echo.Context) error {
+	resp, errResp := h.service.GetAllParkingZones()
+	if errResp != nil {
+		return c.JSON(http.StatusInternalServerError, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: errResp.Message,
+			Errors:  errResp.Errors,
+		})
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}

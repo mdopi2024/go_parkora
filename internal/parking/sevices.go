@@ -35,3 +35,32 @@ func (s *service) Create(req *parkingdto.CreateParkingRequest) (*parkingdto.Crea
 		Data:    zone.ToResponse(),
 	}, nil
 }
+
+func (s *service) GetAllParkingZones() (*parkingdto.GetAllParkingZonesResponse, *httpresponse.ErrorResponse) {
+	zones, err := s.repo.GetAllParkingZones()
+	if err != nil {
+		return nil, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "failed to retrieve parking zones",
+			Errors:  err.Error(),
+		}
+	}
+
+	data := make([]parkingdto.ParkingResponse, 0, len(zones))
+	for _, z := range zones {
+		data = append(data, parkingdto.ParkingResponse{
+			ID:             z.ID,
+			Name:           z.Name,
+			Type:           z.Type,
+			TotalCapacity:  z.TotalCapacity,
+			AvailableSpots: z.AvailableSpots,
+			PricePerHour:   z.PricePerHour,
+		})
+	}
+
+	return &parkingdto.GetAllParkingZonesResponse{
+		Success: true,
+		Message: "Parking zones retrieved successfully",
+		Data:    data,
+	}, nil
+}
