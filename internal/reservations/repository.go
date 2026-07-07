@@ -11,6 +11,7 @@ import (
 
 type Repository interface {
 	CreateReservation(reservation *Reservation) error
+	GetAllReservations() ([]Reservation, error)
 }
 
 type repository struct {
@@ -68,4 +69,16 @@ func (r *repository) CreateReservation(reservation *Reservation) error {
 
 		return nil
 	})
+}
+
+func (r *repository) GetAllReservations() ([]Reservation, error) {
+	var reservations []Reservation
+
+	if err := r.db.
+		Preload("Zone").
+		Find(&reservations).Error; err != nil {
+		return nil, err
+	}
+
+	return reservations, nil
 }

@@ -18,7 +18,8 @@ func ReservationRoutes(e *echo.Echo, db *gorm.DB) {
 	handler := NewHandler(service)
 
 	// Register routes
-	group := e.Group("/api/v1/reservations", middleware.RoleBasedAuthMiddleware(jwtService))
+	group := e.Group("/api/v1/reservations")
 
-	group.POST("", handler.CreateReservation)
+	group.POST("", handler.CreateReservation, middleware.RoleBasedAuthMiddleware(jwtService))
+	group.GET("", handler.GetAllReservations, middleware.RoleBasedAuthMiddleware(jwtService, middleware.RoleAdmin))
 }

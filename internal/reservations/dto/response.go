@@ -19,3 +19,8 @@ type SuccessReservationResponse struct {
 	Message string              `json:"message"`
 	Data    ReservationResponse `json:"data"`
 }
+type GetReservationResponse struct {
+	Success bool                   `json:"success"`
+	Message string                 `json:"message"`
+	Data    []*ReservationResponse `json:"data"`
+}

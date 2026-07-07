@@ -11,17 +11,17 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
-type Handler struct {
-	service Service
+type handler struct {
+	service *service
 }
 
-func NewHandler(service Service) *Handler {
-	return &Handler{
+func NewHandler(service *service) *handler {
+	return &handler{
 		service: service,
 	}
 }
 
-func (h *Handler) CreateReservation(c *echo.Context) error {
+func (h *handler) CreateReservation(c *echo.Context) error {
 	var req dto.CreateReservationRequest
 
 	// Bind request body
@@ -70,4 +70,16 @@ func (h *Handler) CreateReservation(c *echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, resp)
+}
+
+func (h *handler) GetAllReservations(c *echo.Context) error {
+	resp, err := h.service.GetAllReservations()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "failed to retrieve reservations",
+		})
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
