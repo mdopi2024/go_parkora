@@ -20,4 +20,6 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	api.POST("", handler.Create, middleware.RoleBasedAuthMiddleware(jwtService, middleware.RoleAdmin))
 	api.GET("", handler.GetAll, middleware.RoleBasedAuthMiddleware(jwtService, middleware.RoleAdmin, middleware.RoleDriver))
 	api.GET("/:id", handler.GetByID, middleware.RoleBasedAuthMiddleware(jwtService, middleware.RoleAdmin, middleware.RoleDriver))
+	api.PUT("/:id", handler.Update, middleware.RoleBasedAuthMiddleware(jwtService, middleware.RoleAdmin))
+
 }

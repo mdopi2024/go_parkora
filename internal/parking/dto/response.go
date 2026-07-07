@@ -30,3 +30,10 @@ type GetParkingZoneResponse struct {
 	Message string          `json:"message"`
 	Data    ParkingResponse `json:"data"`
 }
+
+type UpdateParkingResponse struct {
+	Success bool            `json:"success"`
+	Message string          `json:"message"`
+	Data    ParkingResponse `json:"data"`
+}
+

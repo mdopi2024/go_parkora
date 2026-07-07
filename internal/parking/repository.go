@@ -8,6 +8,8 @@ type Repository interface {
 	CreateParkingZone(zone *ParkingZone) error
 	GetAllParkingZones() ([]ParkingZoneWithAvailable, error)
 	GetParkingZoneByID(id uint) (*ParkingZoneWithAvailable, error)
+	GetParkingZoneModel(id uint) (*ParkingZone, error)
+	SaveParkingZone(zone *ParkingZone) error
 }
 
 type ParkingZoneWithAvailable struct {
@@ -86,4 +88,18 @@ func (r *repository) GetParkingZoneByID(id uint) (*ParkingZoneWithAvailable, err
 	}
 
 	return &zone, nil
+}
+
+// GetParkingZoneModel fetches the raw ParkingZone GORM model by ID.
+func (r *repository) GetParkingZoneModel(id uint) (*ParkingZone, error) {
+	var zone ParkingZone
+	if err := r.db.First(&zone, id).Error; err != nil {
+		return nil, err
+	}
+	return &zone, nil
+}
+
+// SaveParkingZone persists an existing ParkingZone record.
+func (r *repository) SaveParkingZone(zone *ParkingZone) error {
+	return r.db.Save(zone).Error
 }

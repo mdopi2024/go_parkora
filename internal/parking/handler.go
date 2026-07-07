@@ -77,3 +77,38 @@ func (h *Handler) GetByID(c *echo.Context) error {
 
 	return c.JSON(http.StatusOK, resp)
 }
+
+func (h *Handler) Update(c *echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil || id == 0 {
+		return c.JSON(http.StatusBadRequest, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "invalid zone id",
+		})
+	}
+
+	var req parkingdto.UpdateParkingRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "invalid request payload",
+			Errors:  err,
+		})
+	}
+
+	if err := c.Validate(req); err != nil {
+		return httpresponse.ValidationError(c, err)
+	}
+
+	resp, errResp := h.service.Update(uint(id), &req)
+	if errResp != nil {
+		if errResp.Message == "parking zone not found" {
+			return c.JSON(http.StatusNotFound, errResp)
+		}
+		return c.JSON(http.StatusBadRequest, errResp)
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+

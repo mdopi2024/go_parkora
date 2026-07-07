@@ -8,8 +8,8 @@ type CreateParkingRequest struct {
 }
 
 type UpdateParkingRequest struct {
-	Name          string  `json:"name" validate:"omitempty|required"`
-	Type          string  `json:"type" validate:"omitempty|required"`
+	Name          string  `json:"name" validate:"omitempty"`
+	Type          string  `json:"type" validate:"omitempty"`
 	TotalCapacity int     `json:"total_capacity" validate:"omitempty,min=1"`
 	PricePerHour  float64 `json:"price_per_hour" validate:"omitempty,gt=0"`
 }

@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+
 type service struct {
 	repo Repository
 }
@@ -98,3 +99,51 @@ func (s *service) GetParkingZoneByID(id uint) (*parkingdto.GetParkingZoneRespons
 		},
 	}, nil
 }
+
+func (s *service) Update(id uint, req *parkingdto.UpdateParkingRequest) (*parkingdto.UpdateParkingResponse, *httpresponse.ErrorResponse) {
+	// Fetch the existing record from the database
+	zone, err := s.repo.GetParkingZoneModel(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: "parking zone not found",
+			}
+		}
+		return nil, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "failed to retrieve parking zone",
+			Errors:  err.Error(),
+		}
+	}
+
+	// Only overwrite fields that are non-empty / non-zero; keep existing values otherwise
+	if req.Name != "" {
+		zone.Name = req.Name
+	}
+	if req.Type != "" {
+		zone.Type = ParkingType(req.Type)
+	}
+	if req.TotalCapacity > 0 {
+		zone.TotalCapacity = req.TotalCapacity
+	}
+	if req.PricePerHour > 0 {
+		zone.PricePerHour = req.PricePerHour
+	}
+
+	if err := s.repo.SaveParkingZone(zone); err != nil {
+		return nil, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "failed to update parking zone",
+			Errors:  err.Error(),
+		}
+	}
+
+	return &parkingdto.UpdateParkingResponse{
+		Success: true,
+		Message: "Parking zone updated successfully",
+		Data:    zone.ToResponse(),
+	}, nil
+}
+
+
