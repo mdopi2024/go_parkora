@@ -1,4 +1,6 @@
 package dto
 
-type CreateReservationRequest struct{}
-type UpdateReservationRequest struct{}
+type CreateReservationRequest struct {
+	ZoneID       uint   `json:"zone_id" validate:"required"`
+	LicensePlate string `json:"license_plate" validate:"required,max=15"`
+}
