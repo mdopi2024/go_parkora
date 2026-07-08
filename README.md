@@ -72,30 +72,69 @@ completed
 
 # 📂 Project Structure
 
-```
+```text
 Parkora/
 │
 ├── cmd/
-│   └── server/
-│       └── main.go
+│   └── main.go
 │
 ├── internal/
 │   ├── auth/
+│   │   ├── dto.go
+│   │   ├── handler.go
+│   │   ├── middleware.go
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── routes.go
+│   │   └── service.go
+│   │
 │   ├── user/
+│   │   ├── dto.go
+│   │   ├── handler.go
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── routes.go
+│   │   └── service.go
+│   │
 │   ├── parking/
+│   │   ├── dto.go
+│   │   ├── handler.go
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── routes.go
+│   │   └── service.go
+│   │
 │   ├── reservations/
-│   ├── middleware/
+│   │   ├── dto.go
+│   │   ├── handler.go
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── routes.go
+│   │   └── service.go
+│   │
 │   ├── config/
-│   └── response/
+│   │   ├── database.go
+│   │   ├── env.go
+│   │   └── migrate.go
+│   │
+│   ├── middleware/
+│   │   └── auth.go
+│   │
+│   ├── response/
+│   │   └── response.go
+│   │
+│   └── server/
+│       └── httpserver/
+│           └── server.go
 │
 ├── .env
+├── .env.example
+├── .gitignore
+├── air.toml
 ├── go.mod
 ├── go.sum
-├── air.toml
 └── README.md
 ```
-
----
 
 # ⚙️ Installation & Setup
 
