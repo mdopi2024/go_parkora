@@ -3,6 +3,7 @@ package reservations
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	httpresponse "parkora/internal/httpResponse"
 	"parkora/internal/middleware"
@@ -79,6 +80,40 @@ func (h *handler) GetAllReservations(c *echo.Context) error {
 			Success: false,
 			Message: "failed to retrieve reservations",
 		})
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
+func (h *handler) GetReservationByID(c *echo.Context) error {
+	// Get reservation ID from URL
+	idParam := c.Param("id")
+
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil || id == 0 {
+		return c.JSON(http.StatusBadRequest, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "invalid reservation id",
+		})
+	}
+
+	// Call service
+	resp, err := h.service.GetReservationByID(uint(id))
+	if err != nil {
+
+		switch {
+		case errors.Is(err, ErrReservationNotFound):
+			return c.JSON(http.StatusNotFound, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+
+		default:
+			return c.JSON(http.StatusInternalServerError, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: "failed to retrieve reservation",
+			})
+		}
 	}
 
 	return c.JSON(http.StatusOK, resp)

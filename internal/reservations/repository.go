@@ -12,6 +12,7 @@ import (
 type Repository interface {
 	CreateReservation(reservation *Reservation) error
 	GetAllReservations() ([]Reservation, error)
+	GetReservationByID(id uint) (*Reservation, error)
 }
 
 type repository struct {
@@ -27,6 +28,7 @@ func NewRepository(db *gorm.DB) Repository {
 var (
 	ErrParkingZoneNotFound = errors.New("parking zone not found")
 	ErrParkingZoneFull     = errors.New("parking zone is full")
+	ErrReservationNotFound = errors.New("reservation not found")
 )
 
 func (r *repository) CreateReservation(reservation *Reservation) error {
@@ -81,4 +83,21 @@ func (r *repository) GetAllReservations() ([]Reservation, error) {
 	}
 
 	return reservations, nil
+}
+
+func (r *repository) GetReservationByID(id uint) (*Reservation, error) {
+	var reservation Reservation
+
+	err := r.db.
+		Preload("Zone").
+		First(&reservation, id).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrReservationNotFound
+		}
+		return nil, err
+	}
+
+	return &reservation, nil
 }

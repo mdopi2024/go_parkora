@@ -49,3 +49,16 @@ func (s *service) GetAllReservations() (*dto.GetReservationResponse, error) {
 		Data:    responses,
 	}, nil
 }
+
+func (s *service) GetReservationByID(id uint) (*dto.GetReservationByIDResponse, error) {
+	reservation, err := s.repo.GetReservationByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetReservationByIDResponse{
+		Success: true,
+		Message: "Reservation retrieved successfully",
+		Data:    reservation.ToResponse(),
+	}, nil
+}

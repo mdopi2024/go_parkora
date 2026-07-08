@@ -37,6 +37,12 @@ func (r *Reservation) ToResponse() *dto.ReservationResponse {
 		Status:       string(r.Status),
 		CreatedAt:    r.CreatedAt,
 		UpdatedAt:    r.UpdatedAt,
+		Zone: dto.ZoneResponse{
+			ID:            r.Zone.ID,
+			Name:          r.Zone.Name,
+			Type:          string(r.Zone.Type),
+			TotalCapacity: r.Zone.TotalCapacity,
+			PricePerHour:  r.Zone.PricePerHour,
+		},
 	}
-
 }

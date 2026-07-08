@@ -22,4 +22,5 @@ func ReservationRoutes(e *echo.Echo, db *gorm.DB) {
 
 	group.POST("", handler.CreateReservation, middleware.RoleBasedAuthMiddleware(jwtService))
 	group.GET("", handler.GetAllReservations, middleware.RoleBasedAuthMiddleware(jwtService, middleware.RoleAdmin))
+	group.GET("/:id", handler.GetReservationByID, middleware.RoleBasedAuthMiddleware(jwtService))
 }
