@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net/http"
 	"parkora/internal/config"
 	"parkora/internal/parking"
 	"parkora/internal/reservations"
@@ -27,6 +28,10 @@ func StartServer(db *gorm.DB) {
 	e := echo.New()
 
 	e.Validator = &CustomValidator{validator: validator.New()}
+
+	e.GET("/", func(c *echo.Context) error {
+		return c.String(http.StatusOK, "Welcome to Parkora API!")
+	})
 
 	users.AuthRegister(e, db)
 	parking.RegisterRoutes(e, db)
