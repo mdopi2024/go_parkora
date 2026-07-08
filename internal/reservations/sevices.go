@@ -1,6 +1,9 @@
 package reservations
 
-import "parkora/internal/reservations/dto"
+import (
+	"parkora/internal/middleware"
+	"parkora/internal/reservations/dto"
+)
 
 type service struct {
 	repo Repository
@@ -61,4 +64,64 @@ func (s *service) GetReservationByID(id uint) (*dto.GetReservationByIDResponse, 
 		Message: "Reservation retrieved successfully",
 		Data:    reservation.ToResponse(),
 	}, nil
+}
+
+func (s *service) UpdateReservationFields(
+	id uint,
+	userID uint,
+	role string,
+	req *dto.UpdateReservationRequest,
+) (*dto.ReservationResponse, error) {
+
+	var (
+		reservation *Reservation
+		err         error
+	)
+
+	// Admin can update any reservation
+	// Driver can update only their own reservation
+	if role == string(middleware.RoleAdmin) {
+		reservation, err = s.repo.GetReservationByID(id)
+	} else {
+		reservation, err = s.repo.GetReservationByIDAndUserID(id, userID)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Driver cannot modify cancelled reservation
+	if role == string(middleware.RoleDriver) &&
+		reservation.Status == ReservationStatusCancelled {
+
+		return nil, ErrCannotModifyCancelledReservation
+	}
+
+	// Completed reservation status cannot be changed
+	if reservation.Status == ReservationStatusCompleted &&
+		req.Status != "" {
+
+		return nil, ErrCannotChangeCompletedReservation
+	}
+
+	// Update License Plate
+	if req.LicensePlate != "" {
+		reservation.LicensePlate = req.LicensePlate
+	}
+
+	// Update Zone
+	if req.ZoneID != nil {
+		reservation.ZoneID = *req.ZoneID
+	}
+
+	// Update Status
+	if req.Status != "" {
+		reservation.Status = ReservationStatus(req.Status)
+	}
+
+	if err := s.repo.UpdateReservationFields(reservation); err != nil {
+		return nil, err
+	}
+
+	return reservation.ToResponse(), nil
 }

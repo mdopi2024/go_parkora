@@ -118,3 +118,98 @@ func (h *handler) GetReservationByID(c *echo.Context) error {
 
 	return c.JSON(http.StatusOK, resp)
 }
+
+func (h *handler) UpdateReservationFields(c *echo.Context) error {
+	// Get reservation ID from URL
+	idParam := c.Param("id")
+
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil || id == 0 {
+		return c.JSON(http.StatusBadRequest, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "invalid reservation id",
+		})
+	}
+
+	// Get authenticated user from JWT
+	claim := middleware.GetClaims(c)
+	if claim.UserID == 0 {
+		return c.JSON(http.StatusUnauthorized, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "unauthorized",
+		})
+	}
+
+	// Bind request body
+	var req dto.UpdateReservationRequest
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "invalid request body",
+		})
+	}
+
+	// Validate request body
+	if err := c.Validate(&req); err != nil {
+		return httpresponse.ValidationError(c, err)
+	}
+
+	// Drivers are not allowed to change zone
+	if claim.Role == string(middleware.RoleDriver) && req.ZoneID != nil {
+		return c.JSON(http.StatusForbidden, &httpresponse.ErrorResponse{
+			Success: false,
+			Message: "drivers are not allowed to update zone",
+		})
+	}
+
+	// Call service
+	resp, err := h.service.UpdateReservationFields(
+		uint(id),
+		claim.UserID,
+		claim.Role,
+		&req,
+	)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, ErrReservationNotFound):
+			return c.JSON(http.StatusNotFound, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+
+		case errors.Is(err, ErrParkingZoneNotFound):
+			return c.JSON(http.StatusNotFound, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+
+		case errors.Is(err, ErrParkingZoneFull):
+			return c.JSON(http.StatusConflict, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+
+		case errors.Is(err, ErrCannotModifyCancelledReservation):
+			return c.JSON(http.StatusBadRequest, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+
+		case errors.Is(err, ErrCannotChangeCompletedReservation):
+			return c.JSON(http.StatusForbidden, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+
+		default:
+			return c.JSON(http.StatusInternalServerError, &httpresponse.ErrorResponse{
+				Success: false,
+				Message: "failed to update reservation",
+			})
+		}
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}

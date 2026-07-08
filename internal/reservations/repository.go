@@ -13,6 +13,8 @@ type Repository interface {
 	CreateReservation(reservation *Reservation) error
 	GetAllReservations() ([]Reservation, error)
 	GetReservationByID(id uint) (*Reservation, error)
+	GetReservationByIDAndUserID(reservationID uint, userID uint) (*Reservation, error)
+	UpdateReservationFields(req *Reservation) error
 }
 
 type repository struct {
@@ -26,9 +28,13 @@ func NewRepository(db *gorm.DB) Repository {
 }
 
 var (
-	ErrParkingZoneNotFound = errors.New("parking zone not found")
-	ErrParkingZoneFull     = errors.New("parking zone is full")
-	ErrReservationNotFound = errors.New("reservation not found")
+	ErrParkingZoneNotFound              = errors.New("parking zone not found")
+	ErrParkingZoneFull                  = errors.New("parking zone is full")
+	ErrReservationNotFound              = errors.New("reservation not found")
+	ErrForbiddenAccess                  = errors.New("you are not able to update this reservation")
+	ErrFailedToActions                  = errors.New("Faile oparations")
+	ErrCannotModifyCancelledReservation = errors.New("cancelled reservations cannot be modified")
+	ErrCannotChangeCompletedReservation = errors.New("completed reservation status cannot be changed")
 )
 
 func (r *repository) CreateReservation(reservation *Reservation) error {
@@ -100,4 +106,25 @@ func (r *repository) GetReservationByID(id uint) (*Reservation, error) {
 	}
 
 	return &reservation, nil
+}
+func (r *repository) GetReservationByIDAndUserID(reservationID uint, userID uint) (*Reservation, error) {
+	var reservation Reservation
+
+	err := r.db.
+		Where("id = ? AND user_id = ?", reservationID, userID).
+		Preload("Zone").
+		First(&reservation).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrReservationNotFound
+		}
+		return nil, err
+	}
+
+	return &reservation, nil
+}
+
+func (r *repository) UpdateReservationFields(reservation *Reservation) error {
+	return r.db.Save(reservation).Error
 }
