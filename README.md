@@ -80,52 +80,14 @@ Parkora/
 │
 ├── internal/
 │   ├── auth/
-│   │   ├── dto.go
-│   │   ├── handler.go
-│   │   ├── middleware.go
-│   │   ├── model.go
-│   │   ├── repository.go
-│   │   ├── routes.go
-│   │   └── service.go
-│   │
 │   ├── user/
-│   │   ├── dto.go
-│   │   ├── handler.go
-│   │   ├── model.go
-│   │   ├── repository.go
-│   │   ├── routes.go
-│   │   └── service.go
-│   │
 │   ├── parking/
-│   │   ├── dto.go
-│   │   ├── handler.go
-│   │   ├── model.go
-│   │   ├── repository.go
-│   │   ├── routes.go
-│   │   └── service.go
-│   │
 │   ├── reservations/
-│   │   ├── dto.go
-│   │   ├── handler.go
-│   │   ├── model.go
-│   │   ├── repository.go
-│   │   ├── routes.go
-│   │   └── service.go
-│   │
 │   ├── config/
-│   │   ├── database.go
-│   │   ├── env.go
-│   │   └── migrate.go
-│   │
 │   ├── middleware/
-│   │   └── auth.go
-│   │
 │   ├── response/
-│   │   └── response.go
-│   │
 │   └── server/
 │       └── httpserver/
-│           └── server.go
 │
 ├── .env
 ├── .env.example
